@@ -88,7 +88,19 @@ public class NumberTriangle {
      *
      */
     public int retrieve(String path) {
-        // TODO implement this method
+
+        if (path.isEmpty()) {
+            return this.root;
+        }
+        char FirstStep = path.charAt(0);
+        String remainder = path.substring(1);
+
+        if (FirstStep == 'l') {
+            return this.left.retrieve(remainder);
+        }
+        else if (FirstStep == 'r') {
+            return this.right.retrieve(remainder);
+        }
         return -1;
     }
 
@@ -110,19 +122,45 @@ public class NumberTriangle {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
 
-        // TODO define any variables that you want to use to store things
+        NumberTriangle[] previousRow = null;
 
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
         NumberTriangle top = null;
 
         String line = br.readLine();
+        int lineNumber = 0;
         while (line != null) {
 
             // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
+            String[] numbers = line.trim().split("\\s");
+            NumberTriangle[] currentRow = new NumberTriangle[numbers.length];
 
-            // TODO process the line
+            if (lineNumber == 0) {
+                int rootValue = Integer.parseInt(numbers[0]);
+                top = new NumberTriangle(rootValue);
+                currentRow[0] = top;
+            } else {
+                // Process subsequent rows
+                for (int i = 0; i < numbers.length; i++) {
+                    int rootValue = Integer.parseInt(numbers[i]);
+                    NumberTriangle newNode = new NumberTriangle(rootValue);
+                    currentRow[i] = newNode;
+
+                    // Connect the new node to its parents from the previous row
+                    if (i > 0) {
+                        // Connect to the left parent
+                        previousRow[i-1].setRight(newNode);
+                    }
+                    if (i < previousRow.length) {
+                        // Connect to the right parent
+                        previousRow[i].setLeft(newNode);
+                    }
+                }
+            }
+
+            previousRow = currentRow;
+            lineNumber++;
 
             //read the next line
             line = br.readLine();
